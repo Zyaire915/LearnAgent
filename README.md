@@ -2,6 +2,10 @@
 
 LearnAgent is a student-focused AI learning workspace. It combines uploaded course knowledge, learning tasks, Quiz history, weak-point analysis, proactive weekly reviews, and a Spring AI Tool Calling Agent behind a Vue interface.
 
+## Team Development
+
+Development uses one branch per feature and Pull Requests into `main`. Start with [CONTRIBUTING.md](CONTRIBUTING.md), then choose an assignment from [docs/TEAM_BRANCHES.md](docs/TEAM_BRANCHES.md) or the repository Issues. Never commit `.env`, API keys, uploaded course files, browser profiles, runtime caches, or generated workspaces.
+
 ## Quick Start
 
 Prerequisites: Java 21, Node.js 20+, and PostgreSQL 16 with PGVector. On the original demo machine the database runs in the `Ubuntu-22.04` WSL distribution; collaborators may instead use `docker compose up -d postgres`.
