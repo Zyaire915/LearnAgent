@@ -1,0 +1,1 @@
+package com.learnagent.job;import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;public interface AgentJobRepository extends JpaRepository<AgentJob,UUID>{Optional<AgentJob>findByDedupKey(String key);List<AgentJob>findAllByOrderByCreatedAtDesc();}

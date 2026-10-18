@@ -1,0 +1,3 @@
+package com.learnagent.notification;
+import java.util.*;import org.springframework.web.bind.annotation.*;
+@RestController@RequestMapping("/api/notifications")public class NotificationController{private final NotificationService service;public NotificationController(NotificationService service){this.service=service;}@GetMapping public List<Notification>list(@RequestParam(defaultValue="false")boolean unreadOnly){return service.list(unreadOnly);}@GetMapping("/unread-count")public Map<String,Long>count(){return Map.of("count",service.unreadCount());}@PostMapping("/{id}/read")public Notification read(@PathVariable UUID id){return service.markRead(id);}@PostMapping("/read-all")public void readAll(){service.markAllRead();}}

@@ -1,0 +1,77 @@
+server:
+  port: ${SERVER_PORT:8080}
+  address: ${SERVER_ADDRESS:127.0.0.1}
+spring:
+  application:
+    name: learnagent
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/learnagent}
+    username: ${DB_USERNAME:learnagent}
+    password: ${DB_PASSWORD:learnagent}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
+  ai:
+    model:
+      # Keep startup keyless by default. Set LEARNAGENT_CHAT_PROVIDER=openai
+      # together with OPENAI_API_KEY, or activate the doubao profile with an
+      # ARK_API_KEY, when an actual model call is wanted.
+      chat: ${LEARNAGENT_CHAT_PROVIDER:none}
+      embedding: ${LEARNAGENT_EMBEDDING_PROVIDER:none}
+      image: none
+      moderation: none
+      audio:
+        speech: none
+        transcription: none
+    openai:
+      api-key: ${OPENAI_API_KEY:}
+      chat:
+        options:
+          model: ${OPENAI_CHAT_MODEL:gpt-4o-mini}
+    vectorstore:
+      type: ${LEARNAGENT_VECTOR_STORE:none}
+      pgvector:
+        initialize-schema: true
+        dimensions: 1536
+        distance-type: COSINE_DISTANCE
+learnagent:
+  ai:
+    provider-name: OpenAI
+    key-env-name: OPENAI_API_KEY
+  time-zone: ${LEARNAGENT_TIME_ZONE:Asia/Shanghai}
+  weekly-review:
+    enabled: ${WEEKLY_REVIEW_ENABLED:true}
+    cron: ${WEEKLY_REVIEW_CRON:0 0 20 * * SUN}
+  daily-digest:
+    enabled: ${DAILY_DIGEST_ENABLED:true}
+    cron: ${DAILY_DIGEST_CRON:0 0 8 * * *}
+  memory-review:
+    enabled: ${MEMORY_REVIEW_ENABLED:true}
+    cron: ${MEMORY_REVIEW_CRON:0 0 8 * * *}
+    desired-retention: 0.90
+    max-cards: 20
+    max-minutes: 15
+  workspace:
+    root: ${LEARNAGENT_WORKSPACE_ROOT:workspaces}
+  rag:
+    top-k: ${RAG_TOP_K:5}
+    chunk-size: ${RAG_CHUNK_SIZE:500}
+    min-chunk-size-chars: ${RAG_MIN_CHUNK_SIZE_CHARS:350}
+    max-chunks-per-page: ${RAG_MAX_CHUNKS_PER_PAGE:100}
+  analysis:
+    minimum-attempts: ${ANALYSIS_MINIMUM_ATTEMPTS:3}
+    weak-point-threshold: ${ANALYSIS_WEAK_POINT_THRESHOLD:0.6}
+  cors:
+    allowed-origin: ${CORS_ALLOWED_ORIGIN:http://localhost:5173}
+  web-search:
+    api-key: ${TAVILY_API_KEY:}
+    endpoint: ${TAVILY_ENDPOINT:https://api.tavily.com/search}
+  demo-mode: ${LEARNAGENT_DEMO_MODE:true}
+logging:
+  level:
+    com.learnagent: INFO

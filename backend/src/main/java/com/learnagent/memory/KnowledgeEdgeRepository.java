@@ -1,0 +1,1 @@
+package com.learnagent.memory;import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;public interface KnowledgeEdgeRepository extends JpaRepository<KnowledgeEdge,UUID>{boolean existsByCourseIdAndFromNodeIdAndToNodeIdAndRelation(UUID courseId,UUID from,UUID to,KnowledgeRelation relation);List<KnowledgeEdge>findByCourseId(UUID courseId);}

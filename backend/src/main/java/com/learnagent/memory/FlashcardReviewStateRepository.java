@@ -1,0 +1,1 @@
+package com.learnagent.memory;import java.time.Instant;import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;public interface FlashcardReviewStateRepository extends JpaRepository<FlashcardReviewState,UUID>{List<FlashcardReviewState>findByDueAtLessThanEqualOrderByRetrievabilityAscDueAtAsc(Instant due);}

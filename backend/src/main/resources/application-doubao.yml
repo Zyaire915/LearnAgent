@@ -1,0 +1,46 @@
+spring:
+  config:
+    activate:
+      on-profile: doubao
+  ai:
+    # Volcengine Ark exposes an OpenAI-compatible Chat API, so the existing
+    # Spring AI ChatClient and @Tool integration can be reused unchanged.
+    model:
+      chat: ${LEARNAGENT_CHAT_PROVIDER:none}
+      # Embeddings run locally through ONNX; no extra API quota or service.
+      embedding: ${LEARNAGENT_EMBEDDING_PROVIDER:transformers}
+    openai:
+      api-key: ${ARK_API_KEY:}
+      base-url: https://ark.cn-beijing.volces.com/api/v3
+      chat:
+        completions-path: /chat/completions
+        options:
+          model: ${DOUBAO_CHAT_MODEL:missing-ark-endpoint-id}
+          temperature: ${DOUBAO_TEMPERATURE:0.2}
+          reasoning-effort: ${DOUBAO_REASONING_EFFORT:minimal}
+          max-completion-tokens: ${DOUBAO_MAX_COMPLETION_TOKENS:4096}
+    embedding:
+      transformer:
+        tokenizer:
+          uri: file:${LOCAL_EMBEDDING_CACHE:.models/onnx}/tokenizer.json
+          options:
+            padding: true
+            truncation: true
+        cache:
+          enabled: false
+          directory: ${LOCAL_EMBEDDING_CACHE:.models/onnx}
+        onnx:
+          model-uri: file:${LOCAL_EMBEDDING_CACHE:.models/onnx}/model_quantized.onnx
+          model-output-name: last_hidden_state
+        metadata-mode: NONE
+    vectorstore:
+      type: ${LEARNAGENT_VECTOR_STORE:pgvector}
+      pgvector:
+        dimensions: 384
+        initialize-schema: true
+        distance-type: COSINE_DISTANCE
+
+learnagent:
+  ai:
+    provider-name: Doubao Seed 2.0 Mini
+    key-env-name: ARK_API_KEY

@@ -1,0 +1,54 @@
+# Secrets and machine-local configuration
+.env
+.env.*
+!.env.example
+.env.local
+.env.*.local
+*.pem
+*.p12
+*.jks
+*.key
+*.pfx
+*.crt
+*.cer
+
+# Build outputs and dependency caches
+**/target/
+**/node_modules/
+**/dist/
+**/coverage/
+.mvn/wrapper/maven-wrapper.jar
+.mvn-cache/
+.npm-cache/
+.runtime/
+.cache/
+.models/
+
+# IDE and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
+~$*
+*.tmp
+
+# Runtime data, browser profiles, logs and temporary files
+*.log
+backend-run*.log
+.tmp/
+.browser-profile*/
+presentation/.edge-profile*/
+presentation/.build/
+presentation/.codex-finalizer/
+presentation/speech/.rendered/
+
+# User-owned learning data and generated workspaces
+workspaces/
+demo-data/
+uploads/
+*.db
+*.sqlite
+*.sqlite3
+
+# Local verification screenshots at repository root
+/*.png

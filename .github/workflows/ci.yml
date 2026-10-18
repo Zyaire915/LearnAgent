@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [main, "feature/**", "fix/**"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_DB: learnagent
+          POSTGRES_USER: learnagent
+          POSTGRES_PASSWORD: learnagent
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U learnagent -d learnagent"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      DB_URL: jdbc:postgresql://localhost:5432/learnagent
+      DB_USERNAME: learnagent
+      DB_PASSWORD: learnagent
+      LEARNAGENT_CHAT_PROVIDER: none
+      LEARNAGENT_EMBEDDING_PROVIDER: none
+      LEARNAGENT_VECTOR_STORE: none
+      LEARNAGENT_DEMO_MODE: false
+      WEEKLY_REVIEW_ENABLED: false
+      DAILY_DIGEST_ENABLED: false
+      MEMORY_REVIEW_ENABLED: false
+      RUN_DB_INTEGRATION: true
+      LEARNAGENT_WORKSPACE_ROOT: ${{ runner.temp }}/learnagent-workspaces
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Backend tests
+        run: mvn -B -pl backend test
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Frontend build
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build

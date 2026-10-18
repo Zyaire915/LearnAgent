@@ -1,0 +1,8 @@
+spring:
+  config:
+    activate:
+      on-profile: demo
+learnagent:
+  demo-mode: true
+  weekly-review:
+    enabled: false

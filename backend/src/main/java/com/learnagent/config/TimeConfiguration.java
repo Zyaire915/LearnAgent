@@ -1,0 +1,1 @@
+package com.learnagent.config;import java.time.Clock;import org.springframework.context.annotation.*;@Configuration public class TimeConfiguration{@Bean Clock applicationClock(){return Clock.systemUTC();}}

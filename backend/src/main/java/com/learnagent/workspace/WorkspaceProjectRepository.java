@@ -1,0 +1,1 @@
+package com.learnagent.workspace;import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;public interface WorkspaceProjectRepository extends JpaRepository<WorkspaceProject,UUID>{Optional<WorkspaceProject>findBySlug(String slug);List<WorkspaceProject>findAllByOrderByUpdatedAtDesc();}

@@ -1,0 +1,1 @@
+package com.learnagent.analysis;import org.springframework.boot.context.properties.ConfigurationProperties;@ConfigurationProperties(prefix="learnagent.analysis")public record AnalysisProperties(int minimumAttempts,double weakPointThreshold){}

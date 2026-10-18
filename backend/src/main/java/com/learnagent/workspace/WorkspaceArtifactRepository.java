@@ -1,0 +1,1 @@
+package com.learnagent.workspace;import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;public interface WorkspaceArtifactRepository extends JpaRepository<WorkspaceArtifact,UUID>{List<WorkspaceArtifact>findByWorkspaceIdOrderByCreatedAt(UUID workspaceId);Optional<WorkspaceArtifact>findByWorkspaceIdAndRelativePath(UUID workspaceId,String path);}

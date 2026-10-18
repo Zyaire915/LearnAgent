@@ -1,0 +1,1 @@
+package com.learnagent.quiz;import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;public interface QuestionRepository extends JpaRepository<Question,UUID>{List<Question> findByQuizId(UUID quizId);}

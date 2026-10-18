@@ -1,0 +1,1 @@
+package com.learnagent.digest;import java.time.LocalDate;import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;public interface DailyDigestRepository extends JpaRepository<DailyDigest,UUID>{Optional<DailyDigest>findByDigestDate(LocalDate date);Optional<DailyDigest>findFirstByOrderByDigestDateDesc();List<DailyDigest>findAllByOrderByDigestDateDesc();}

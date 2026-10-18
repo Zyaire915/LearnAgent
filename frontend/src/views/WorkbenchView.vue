@@ -1,0 +1,34 @@
+<script setup>
+import { computed, onMounted, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import { ElMessage } from 'element-plus'
+import { api } from '../api'
+import CodeEditor from '../components/CodeEditor.vue'
+import { renderMarkdown } from '../markdown'
+import { zh } from '../localize'
+
+const route=useRoute(),router=useRouter()
+const workspaces=ref([]),courses=ref([]),selected=ref(null),tree=ref([]),currentPath=ref(''),content=ref(''),saved=ref(''),buildLog=ref('')
+const loading=ref(true),busy=ref(false),error=ref(''),dialog=ref(false)
+const draft=ref({courseId:null,name:'',description:'',template:'GENERIC'})
+const dirty=computed(()=>content.value!==saved.value)
+const isMarkdown=computed(()=>currentPath.value.toLowerCase().endsWith('.md'))
+const editorLanguage=computed(()=>currentPath.value.endsWith('.java')?'java':'markdown')
+const preview=computed(()=>isMarkdown.value?renderMarkdown(content.value):'')
+const buildSupported=computed(()=>tree.value.some(entry=>!entry.directory&&entry.path==='pom.xml'))
+const canCreate=computed(()=>draft.value.description.trim().length>=8)
+
+onMounted(async()=>{try{[workspaces.value,courses.value]=await Promise.all([api.workspaces(),api.courses()]);if(route.query.path)await openGlobal(String(route.query.path));else{const target=route.query.workspaceId||workspaces.value[0]?.id;if(target)await selectWorkspace(String(target))}}catch(e){error.value=e.message}finally{loading.value=false}})
+async function selectWorkspace(id){selected.value=workspaces.value.find(item=>item.id===id)||null;if(!selected.value)return;tree.value=await api.workspaceTree(id);const preferred=tree.value.find(item=>item.path==='PROJECT_PLAN.md')||tree.value.find(item=>!item.directory&&item.path.endsWith('.md'))||tree.value.find(item=>!item.directory);if(preferred)await openFile(preferred.path);router.replace({path:'/workbench',query:{workspaceId:id}})}
+async function openFile(path){if(dirty.value&&!confirm('当前文件尚未保存，确定切换吗？'))return;const value=selected.value?await api.workspaceFile(selected.value.id,path):await api.sandboxFile(path);currentPath.value=value.path;content.value=saved.value=value.content}
+async function openGlobal(path){selected.value=null;tree.value=[];const value=await api.sandboxFile(path);currentPath.value=value.path;content.value=saved.value=value.content}
+async function save(){busy.value=true;try{selected.value?await api.saveWorkspaceFile(selected.value.id,currentPath.value,content.value):await api.saveSandboxFile(currentPath.value,content.value);saved.value=content.value}catch(e){error.value=e.message}finally{busy.value=false}}
+async function createProject(){if(!canCreate.value)return;busy.value=true;error.value='';try{const payload={...draft.value,name:draft.value.name.trim()||null,description:draft.value.description.trim(),template:'GENERIC'};const created=await api.createWorkspace(payload);const generated=await api.generateWorkspace(created.id);workspaces.value=await api.workspaces();dialog.value=false;draft.value={courseId:null,name:'',description:'',template:'GENERIC'};await selectWorkspace(generated.id)}catch(e){error.value=e.message}finally{busy.value=false}}
+async function generate(){busy.value=true;try{await api.generateWorkspace(selected.value.id);workspaces.value=await api.workspaces();await selectWorkspace(selected.value.id)}catch(e){error.value=e.message}finally{busy.value=false}}
+async function build(){busy.value=true;buildLog.value='';try{const result=await api.buildWorkspace(selected.value.id,'test');buildLog.value=result.log;workspaces.value=await api.workspaces()}catch(e){error.value=e.message}finally{busy.value=false}}
+async function openFolder(){if(!selected.value)return;busy.value=true;try{const result=await api.openWorkspaceFolder(selected.value.id);if(result.opened)ElMessage.success(`已打开：${result.path}`)}catch(e){error.value=e.message}finally{busy.value=false}}
+</script>
+
+<template><section class="workbench-page"><div class="section-heading compact"><div><span class="eyebrow">文件驱动学习</span><h2>项目工作台</h2><p>用自然语言描述你的想法，自动生成项目计划、学习任务、资料与初始文件。</p></div><div><el-button type="primary" @click="dialog=true">创建项目</el-button><el-button v-if="selected" :loading="busy" @click="openFolder">打开项目文件夹</el-button><el-button v-if="selected&&selected.status==='CREATED'" :loading="busy" @click="generate">生成项目内容</el-button><el-button v-if="selected&&buildSupported" :loading="busy" @click="build">运行项目测试</el-button></div></div><el-alert v-if="error" class="page-alert" type="error" :title="error" show-icon @close="error=''"/><el-skeleton v-if="loading" :rows="10" animated/><div v-else class="workbench-shell"><aside class="workspace-sidebar"><h3>项目</h3><button v-for="workspace in workspaces" :key="workspace.id" :class="{active:selected?.id===workspace.id}" @click="selectWorkspace(workspace.id)"><strong>{{workspace.name}}</strong><small>{{workspace.status}}</small></button><template v-if="selected"><h3>文件</h3><button v-for="entry in tree" :key="entry.path" class="tree-entry" :disabled="entry.directory" @click="!entry.directory&&openFile(entry.path)"><span>{{entry.directory?'▸':'·'}}</span>{{entry.path}}</button></template></aside><main class="editor-pane"><div class="file-toolbar"><strong>{{currentPath||'选择一个文件'}}</strong><span v-if="dirty">未保存</span><el-button size="small" :disabled="!currentPath||!dirty" :loading="busy" @click="save">保存</el-button></div><CodeEditor v-if="currentPath" v-model="content" :language="editorLanguage"/><el-empty v-else description="从左侧选择项目文件"/></main><aside class="preview-pane"><div class="file-toolbar"><strong>{{isMarkdown?'Markdown 预览':'文件与运行信息'}}</strong></div><article v-if="isMarkdown" class="markdown-preview" v-html="preview"/><pre v-else-if="buildLog" class="build-log">{{buildLog}}</pre><div v-else class="preview-placeholder">选择文件查看内容；支持测试的项目运行后会在这里显示日志。</div></aside></div>
+
+<el-dialog v-model="dialog" title="创建项目" width="620px"><el-form label-position="top"><el-form-item label="关联课程"><el-select v-model="draft.courseId" clearable placeholder="可选：选择项目所属课程"><el-option v-for="course in courses" :key="course.id" :value="course.id" :label="zh(course.name)"/></el-select></el-form-item><el-form-item label="项目名称（可选）"><el-input v-model="draft.name" placeholder="留空时将根据描述自动命名"/></el-form-item><el-form-item label="你想完成什么项目？" required><el-input v-model="draft.description" type="textarea" :rows="6" maxlength="1200" show-word-limit placeholder="请描述项目目标、希望实现的功能、成果形式或技术限制。例如：为计算机网络课程制作一个可视化 TCP 拥塞控制学习项目，包含资料整理、实验步骤和演示页面。"/><small class="project-description-hint">描述越具体，生成的计划、任务和资料越贴合你的目标。</small></el-form-item></el-form><template #footer><el-button @click="dialog=false">取消</el-button><el-button type="primary" :loading="busy" :disabled="!canCreate" @click="createProject">创建并自动生成</el-button></template></el-dialog></section></template>

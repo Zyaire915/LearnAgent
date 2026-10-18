@@ -1,0 +1,3 @@
+package com.learnagent.knowledge;
+import java.util.UUID;
+public record KnowledgeSource(SourceType type,String title,String snippet,String url,String sourceName,String filename,Integer pageNumber,UUID documentId){public enum SourceType{LOCAL,WEB}public static KnowledgeSource local(UUID documentId,String filename,Integer pageNumber,String snippet){return new KnowledgeSource(SourceType.LOCAL,filename,snippet,null,null,filename,pageNumber,documentId);}public static KnowledgeSource web(String title,String url,String sourceName,String snippet){return new KnowledgeSource(SourceType.WEB,title,snippet,url,sourceName,null,null,null);}}

@@ -1,0 +1,1 @@
+package com.learnagent.weekly;import java.util.List;public record WeeklyLearningSnapshot(long tasksCompleted,long tasksPending,long quizzesCompleted,long questionsAnswered,long correctAnswers,double overallAccuracy,List<WeakPointSnapshot> weakPoints){public record WeakPointSnapshot(String knowledgePoint,int attemptCount,double accuracy){}}

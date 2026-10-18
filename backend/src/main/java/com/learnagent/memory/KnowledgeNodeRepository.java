@@ -1,0 +1,1 @@
+package com.learnagent.memory;import java.util.*;import org.springframework.data.jpa.repository.JpaRepository;public interface KnowledgeNodeRepository extends JpaRepository<KnowledgeNode,UUID>{Optional<KnowledgeNode>findByCourseIdAndNormalizedKey(UUID courseId,String key);List<KnowledgeNode>findByCourseIdOrderByName(UUID courseId);}
