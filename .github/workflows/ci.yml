@@ -37,7 +37,7 @@ jobs:
       DAILY_DIGEST_ENABLED: false
       MEMORY_REVIEW_ENABLED: false
       RUN_DB_INTEGRATION: true
-      LEARNAGENT_WORKSPACE_ROOT: ${{ runner.temp }}/learnagent-workspaces
+      LEARNAGENT_WORKSPACE_ROOT: /tmp/learnagent-workspaces
 
     steps:
       - uses: actions/checkout@v4
