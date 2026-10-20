@@ -16,3 +16,30 @@
 .project-description-hint{display:block;margin-top:7px;color:#8792a7}.latest-review{max-width:1080px;margin:0 auto}.weak-analysis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.weak-analysis article{background:#f6f8fc;border-radius:10px;padding:13px}.weak-analysis article>div{display:flex;justify-content:space-between;gap:12px;margin-bottom:8px}.weak-analysis span{font-size:12px;color:#77839a}@media(max-width:800px){.weak-analysis{grid-template-columns:1fr}}
 .markdown-preview table{display:block;width:100%;overflow-x:auto;border-collapse:collapse;margin:16px 0}.markdown-preview th,.markdown-preview td{min-width:110px;border:1px solid #dfe4ee;padding:9px 12px;text-align:left;vertical-align:top}.markdown-preview th{background:#f1f4f9;color:#253453;font-weight:700}.markdown-preview tr:nth-child(even) td{background:#fafbfe}.resources-page{max-width:1280px}.resource-metrics{display:flex;gap:10px}.resource-metrics span{background:#fff;border:1px solid #e3e8f2;border-radius:10px;padding:10px 14px;color:#78849a}.resource-metrics strong{color:#2b3958;font-size:20px;margin-right:4px}.resources-shell{display:grid;grid-template-columns:280px minmax(0,1fr);min-height:680px;background:#fff;border:1px solid #e3e8f2;border-radius:16px;overflow:hidden}.resource-collections{padding:16px;border-right:1px solid #e5e9f1;overflow:auto}.resource-collections h3{margin:4px 8px 12px}.resource-collections button{display:flex;width:100%;flex-direction:column;align-items:flex-start;gap:7px;border:0;background:transparent;border-radius:10px;padding:12px;text-align:left;cursor:pointer;color:#2d3a57}.resource-collections button:hover,.resource-collections button.active{background:#eef2fb}.resource-collections small{color:#8b96aa}.resource-content{padding:22px;overflow:auto}.resource-toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}.resource-toolbar h3{margin:5px 0}.resource-links{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:18px 0}.resource-links article{border:1px solid #e4e8f1;border-radius:12px;padding:15px;background:#fafbfe}.resource-link-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}.resource-link-head a{color:#3f56c6;text-decoration:none;font-weight:700;line-height:1.45}.resource-link-head a:hover{text-decoration:underline}.resource-links p{color:#5f6d86;line-height:1.65;white-space:pre-line;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}.resource-links small{color:#929caf}.resource-markdown{border-top:1px solid #e5e9f1;margin-top:20px;padding-top:18px}.resource-markdown .markdown-preview{max-height:620px;border:1px solid #e6eaf2;border-radius:12px;margin-top:12px}@media(max-width:900px){.resources-shell{grid-template-columns:1fr}.resource-collections{border-right:0;border-bottom:1px solid #e5e9f1;max-height:260px}.resource-links{grid-template-columns:1fr}.resource-metrics{width:100%}}
 @media(max-width:1100px){.workbench-shell{grid-template-columns:220px 1fr}.preview-pane{display:none}.recommendation-grid{grid-template-columns:1fr}.template-options{grid-template-columns:1fr}}
+
+/* 学习任务：归属视图（对齐原项目白底卡片风格） */
+.view-switch{display:inline-flex;background:#eef1f8;border-radius:9px;padding:3px;margin-right:4px}
+.view-switch button{border:0;background:transparent;border-radius:7px;padding:6px 14px;cursor:pointer;color:#6b7690;font-size:13px}
+.view-switch button.active{background:#fff;color:#3b4fd0;font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.project-group{border:1px solid #e6ebf4;border-radius:14px;background:#fff;padding:16px 18px;margin-bottom:12px}
+.project-group.complete{border-color:#c8ecd9}
+.project-header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid #edf0f6}
+.project-title{display:flex;flex-direction:column;gap:2px;min-width:0}
+.project-title strong{font-size:15px;color:#263454}
+.project-title small{color:#8b96aa;font-size:12px}
+.task-order{flex:none;font-size:12px}
+.task-order.done{background:#dcf7ea!important;color:#21885e!important}
+.course-group{margin-bottom:14px}
+.course-group-header{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.course-group-header strong{font-size:14px;color:#3a4766}
+/* 已完成任务折叠区 */
+.completed-section{border-top:1px solid #edf0f6;padding-top:14px;margin-top:6px}
+.completed-toggle{display:flex;align-items:center;gap:8px;width:100%;border:0;background:transparent;cursor:pointer;padding:6px 4px;color:#596be5;font-size:14px;text-align:left}
+.completed-toggle:hover{color:#3b4fd0}
+.completed-toggle .toggle-arrow{font-size:11px;color:#8b96aa;transition:transform .15s}
+.completed-toggle strong{font-size:14px;color:#3a4766}
+.completed-toggle .completed-count{color:#8b96aa;font-size:12px;font-weight:400}
+.completed-content{margin-top:8px}
+/* 外部资料：分区标题 */
+.collection-kind{font-size:11px;color:#8b96aa;text-transform:uppercase;letter-spacing:.8px;margin:12px 8px 6px;font-weight:700}
+.collection-kind:first-of-type{margin-top:4px}
