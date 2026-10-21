@@ -301,6 +301,46 @@ public class QuizService {
   }
 
   @Transactional(readOnly = true)
+  public List<QuizDtos.HistoryView> history(UUID courseId) {
+    return (courseId == null ? quizzes.findAll() : quizzes.findByCourseId(courseId)).stream()
+        .filter(quiz -> quiz.getStatus() == QuizStatus.COMPLETED)
+        .sorted((left, right) -> right.getCompletedAt().compareTo(left.getCompletedAt()))
+        .map(quiz -> {
+          List<AnswerRecord> records = answers.findByQuizIdOrderByAnsweredAtAsc(quiz.getId());
+          int total = records.size();
+          int correct = (int) records.stream().filter(AnswerRecord::isCorrect).count();
+          return new QuizDtos.HistoryView(quiz.getId(), quiz.getCourseId(), quiz.getTitle(),
+              quiz.getKnowledgePoint(), quiz.getStatus(), quiz.getLearningSessionId(),
+              quiz.getLearningRoundNumber(), quiz.getCreatedAt(), quiz.getCompletedAt(), total,
+              correct, total == 0 ? 0 : (double) correct / total);
+        }).toList();
+  }
+
+  @Transactional(readOnly = true)
+  public QuizDtos.HistoryDetail historyDetail(UUID id) {
+    Quiz quiz = quizzes.findById(id)
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Quiz not found."));
+    List<AnswerRecord> records = answers.findByQuizIdOrderByAnsweredAtAsc(id);
+    if (quiz.getStatus() != QuizStatus.COMPLETED || records.isEmpty()) {
+      throw new ResponseStatusException(HttpStatus.CONFLICT, "Quiz has no completed result yet.");
+    }
+    List<QuizDtos.Result> results = new ArrayList<>();
+    List<QuizDtos.HistoryAnswer> historyAnswers = new ArrayList<>();
+    for (AnswerRecord record : records) {
+      Question question = questions.findById(record.getQuestionId()).orElse(null);
+      String correctAnswer = question == null ? null : question.getCorrectAnswer();
+      String explanation = question == null ? null : question.getExplanation();
+      results.add(new QuizDtos.Result(record.getQuestionId(), record.isCorrect(), correctAnswer,
+          explanation, record.getKnowledgePoint()));
+      historyAnswers.add(new QuizDtos.HistoryAnswer(record.getQuestionId(), record.getUserAnswer(),
+          record.isCorrect(), correctAnswer, explanation, record.getKnowledgePoint()));
+    }
+    int correct = (int) records.stream().filter(AnswerRecord::isCorrect).count();
+    return new QuizDtos.HistoryDetail(view(quiz), records.size(), correct,
+        (double) correct / records.size(), results, historyAnswers);
+  }
+
+  @Transactional(readOnly = true)
   public List<WrongAnswer> getWrongAnswers(UUID courseId) {
     return answers.findByCourseId(courseId).stream()
         .filter(answer -> !answer.isCorrect())

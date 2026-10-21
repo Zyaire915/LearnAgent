@@ -8,6 +8,7 @@ const route = useRoute(), router = useRouter()
 const courses = ref([]), courseId = ref(''), knowledgePoint = ref(''), count = ref(5)
 const quiz = ref(null), session = ref(null), answers = ref({}), result = ref(null)
 const loading = ref(false), error = ref('')
+const historyOpen = ref(false), historyLoading = ref(false), historyItems = ref([]), historyCourseNames = ref({})
 const currentRound = computed(() => session.value?.rounds?.at(-1) || null)
 const adaptive = computed(() => !!session.value)
 const allAnswered = computed(() => quiz.value && Object.keys(answers.value).length === quiz.value.questions.length)
@@ -18,10 +19,31 @@ onMounted(async () => {
   knowledgePoint.value = String(route.query.knowledgePoint || '')
   try {
     courses.value = await api.courses()
+    historyCourseNames.value = Object.fromEntries(courses.value.map(course => [course.id, zh(course.name)]))
     courseId.value = String(route.query.courseId || courses.value[0]?.id || '')
+    await loadHistory()
     if (route.query.sessionId) await loadSession(String(route.query.sessionId))
   } catch (e) { error.value = e.message }
 })
+
+async function loadHistory() {
+  historyLoading.value = true
+  try { historyItems.value = await api.quizHistory() }
+  catch (e) { error.value = e.message }
+  finally { historyLoading.value = false }
+}
+async function openHistoryRecord(id) {
+  loading.value = true; error.value = ''
+  try {
+    const record = await api.quizHistoryDetail(id)
+    quiz.value = record.quiz; session.value = null
+    answers.value = Object.fromEntries(record.answers.map(answer => [answer.questionId, answer.userAnswer]))
+    result.value = { totalQuestions: record.totalQuestions, correctCount: record.correctCount,
+      accuracy: record.accuracy, results: record.results }
+    historyOpen.value = false
+  } catch (e) { error.value = e.message }
+  finally { loading.value = false }
+}
 
 async function loadSession(id) {
   session.value = await api.learningSession(id)
@@ -78,10 +100,21 @@ function resultFor(id) {
 
 <template>
   <section>
-    <div class="section-heading"><div><span class="eyebrow">主动测评</span><h2>自适应备考</h2><p>选择任意课程与主题，系统会结合课程资料和可追溯的网络资料自动出题。</p></div></div>
+    <div class="section-heading"><div><span class="eyebrow">主动测评</span><h2>自适应备考</h2><p>选择任意课程与主题，系统会结合课程资料和可追溯的网络资料自动出题。</p></div><el-button :loading="historyLoading" @click="historyOpen=!historyOpen; historyOpen&&loadHistory()">{{historyOpen?'返回测验':'测验记录'}}<el-badge v-if="historyItems.length" :value="historyItems.length" class="history-badge"/></el-button></div>
     <el-alert v-if="error" class="page-alert" type="warning" :title="error" show-icon @close="error=''"/>
 
-    <div v-if="!quiz" class="document-panel quiz-form adaptive-start">
+    <div v-if="historyOpen" class="document-panel quiz-history">
+      <div class="card-header"><div><h3>已完成的测验</h3><p class="muted">切换页面或重新打开网站后，已提交的答题记录仍会保留。</p></div><el-button text :loading="historyLoading" @click="loadHistory">刷新</el-button></div>
+      <div v-if="historyItems.length" class="quiz-history-list">
+        <button v-for="item in historyItems" :key="item.id" class="quiz-history-item" @click="openHistoryRecord(item.id)">
+          <div><strong>{{zh(item.title)}}</strong><small>{{historyCourseNames[item.courseId]||'课程'}} · {{item.knowledgePoint?zh(item.knowledgePoint):'综合练习'}}<template v-if="item.learningRoundNumber"> · 自适应第{{item.learningRoundNumber}}轮</template></small><small>{{new Date(item.completedAt).toLocaleString()}}</small></div>
+          <span class="quiz-history-score">{{item.correctCount}} / {{item.totalQuestions}}<small>{{Math.round(item.accuracy*100)}}%</small></span>
+        </button>
+      </div>
+      <el-empty v-else description="还没有已完成的测验。提交一次测验后，成绩和逐题答案会保存在这里。"/>
+    </div>
+
+    <div v-else-if="!quiz" class="document-panel quiz-form adaptive-start">
       <el-select v-model="courseId" placeholder="选择课程" @change="courseChanged"><el-option v-for="course in courses" :key="course.id" :label="zh(course.name)" :value="course.id"/></el-select>
       <el-input v-model="knowledgePoint" :placeholder="topicPlaceholder"/>
       <div class="quiz-start-actions">

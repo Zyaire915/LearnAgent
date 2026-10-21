@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -14,6 +15,13 @@ public final class QuizDtos {
   public record QuestionView(UUID id, String content, List<String> options, String knowledgePoint, List<SourceRef> sources) { }
   public record QuizView(UUID id, UUID courseId, String title, String knowledgePoint, QuizStatus status,
                          UUID learningSessionId, Integer learningRoundNumber, List<QuestionView> questions) { }
+  public record HistoryView(UUID id, UUID courseId, String title, String knowledgePoint, QuizStatus status,
+                            UUID learningSessionId, Integer learningRoundNumber, Instant createdAt,
+                            Instant completedAt, int totalQuestions, int correctCount, double accuracy) { }
+  public record HistoryAnswer(UUID questionId, String userAnswer, boolean correct, String correctAnswer,
+                              String explanation, String knowledgePoint) { }
+  public record HistoryDetail(QuizView quiz, int totalQuestions, int correctCount, double accuracy,
+                              List<Result> results, List<HistoryAnswer> answers) { }
   public record SubmitRequest(@NotEmpty List<Answer> answers) { }
   public record Answer(@NotNull UUID questionId, String answer) { }
   public record Result(UUID questionId, boolean correct, String correctAnswer, String explanation, String knowledgePoint) { }
