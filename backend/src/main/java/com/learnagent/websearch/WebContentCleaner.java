@@ -26,7 +26,7 @@ public final class WebContentCleaner {
     List<String> lines = new ArrayList<>();
     String previous = null;
     for (String sourceLine : normalized.split("\\R+")) {
-      String line = sourceLine.replaceAll("[ \\t]+", " ").trim();
+      String line = sourceLine.replaceFirst("^\\s*spContent\\s*=\\s*", "").replaceAll("[ \\t]+", " ").trim();
       if (line.isBlank() || NAVIGATION_NOISE.contains(line) || line.equals(previous)) continue;
       lines.add(line);
       previous = line;

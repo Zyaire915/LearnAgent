@@ -220,7 +220,7 @@ public class WorkspaceService {
     if (web.isConfigured()) {
       String query = requestedQuery == null || requestedQuery.isBlank()
           ? project.getDescription() + " 学习资料 官方教程 最佳实践" : requestedQuery;
-      try { found = web.search(query, 3); }
+      try { found = web.search(query, 5); }
       catch (RuntimeException ignored) { found = List.of(); }
     }
     StringBuilder markdown = new StringBuilder("# 外部学习资料\n\n> 以下内容是摘要与来源链接，不替代原始资料。\n\n");
@@ -231,13 +231,15 @@ public class WorkspaceService {
       markdown.append("## ").append(index + 1).append(". ").append(title).append("\n\n")
           .append(summary).append("\n\n- 来源：[").append(item.sourceName()).append("](")
           .append(item.url()).append(")\n- 检索时间：").append(Instant.now()).append("\n\n");
+      if (item.review() != null) markdown.append("- 自动审查：").append(item.review().status()).append("；推荐排序分：").append(item.review().score()).append("\n- 推荐依据：").append(item.review().reason()).append("\n\n");
       String resourcePath = project.getSlug() + "/resources/research.md";
       if (!resources.existsByUrlAndLocalMarkdownPath(item.url(), resourcePath)) {
         resources.save(new ExternalResource(null, project.getCourseId(), title, item.url(),
-            item.sourceName(), summary, item.publishedAt(), resourcePath));
+            item.sourceName(), summary, item.publishedAt(), resourcePath).reviewed(item.review()));
       }
     }
-    if (found.isEmpty()) markdown.append("当前未获取到外部资料，可以先根据 PROJECT_PLAN.md 推进，并稍后重新检索。\n");
+    if (found.size() < 5) markdown.append("本次符合条件的资料不足 5 条，仅展示实际找到的资料。\n\n");
+    if (found.isEmpty()) markdown.append("当前没有通过正文审核的外部资料（可能为抓取/模型不可用、正文超长或质量不符），可先根据 PROJECT_PLAN.md 推进。\n");
     writeArtifact(project, "RESOURCE", "resources/research.md", markdown.toString(),
         found.isEmpty() ? null : found.getFirst().url());
   }
