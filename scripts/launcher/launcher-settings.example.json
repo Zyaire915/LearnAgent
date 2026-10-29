@@ -1,0 +1,8 @@
+{
+  "dataRoot": "",
+  "backendPort": 8080,
+  "pgPort": 5433,
+  "openBrowser": true,
+  "popupOnError": true,
+  "demoMode": true
+}

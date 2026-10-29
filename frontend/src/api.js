@@ -1,4 +1,4 @@
-const base = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
+const base = import.meta.env.VITE_API_BASE_URL || ''
 const friendlyErrors = [
   ['AI_PROVIDER_NOT_CONFIGURED', 'AI 服务尚未配置，请添加 API Key 后重试。'],
   ['VECTOR_STORE_UNAVAILABLE', '课程知识库暂不可用。'],

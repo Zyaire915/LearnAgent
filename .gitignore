@@ -52,3 +52,9 @@ uploads/
 
 # Local verification screenshots at repository root
 /*.png
+
+# Windows launcher (feature/windows-launcher): build outputs, local settings and release packages
+release/
+scripts/launcher/launcher-settings.json
+learnagent.env
+*.exe

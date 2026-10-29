@@ -30,6 +30,32 @@ Open `http://localhost:5173`. A convenience launcher is also available:
 powershell -ExecutionPolicy Bypass -File .\scripts\start-dev.ps1
 ```
 
+## Windows One-Click Launcher (Portable Build)
+
+`feature/windows-launcher` ships a small Windows launcher for non-developers. Unzip the portable
+package and double-click `LearnAgent.exe` (built with **jpackage**, so it carries its own JRE). The
+launcher starts the bundled **PostgreSQL 16 + pgvector** and the Spring Boot backend (which also
+serves the pre-built Vue app), then opens the browser. The target computer needs **no** Java,
+Node.js, Maven, WSL, Docker or PostgreSQL.
+
+- **Data location**: everything is written to `%LOCALAPPDATA%\LearnAgent` (learning data, uploads,
+  caches, logs and the bundled database under `pgdata\`).
+- **Secrets stay external**: API keys only live in `%LOCALAPPDATA%\LearnAgent\learnagent.env` (or the
+  repo's `.env`); they are never compiled into the EXE and never packed into the ZIP.
+- **Single instance**: a named mutex plus a `/api/system/status` health probe guarantee that
+  double-clicking again only opens another browser tab instead of starting a second backend.
+- **Nothing is deleted on exit**: `launcher\Stop-LearnAgent.ps1` only stops processes; `pgdata`,
+  workspaces and logs are preserved.
+
+Build the portable package on a machine with JDK 21 and Node.js 20+:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\build-release.ps1
+```
+
+See [docs/WINDOWS_LAUNCHER.md](docs/WINDOWS_LAUNCHER.md) for the design, the acceptance mapping and
+troubleshooting, and [docs/TEST-RESULTS.md](docs/TEST-RESULTS.md) for the verification record.
+
 ## Core Features
 
 - Course cards and PDF document processing states
