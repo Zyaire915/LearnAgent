@@ -5,7 +5,7 @@ import { formatDateTime, statusText, zh } from '../localize'
 const loading=ref(true),unavailable=ref(false),status=ref(null),statistics=ref(null),weakPoints=ref([]),latestReview=ref(null),latestDigest=ref(null),tasks=ref([]),quizzes=ref([]),memory=ref(null)
 const pendingTasks=computed(()=>tasks.value.filter(task=>task.status!=='COMPLETED').slice(0,4))
 const recentQuizzes=computed(()=>quizzes.value.slice(0,3))
-onMounted(async()=>{try{const base=import.meta.env.VITE_API_BASE_URL||'http://localhost:8080';const response=await fetch(`${base}/api/system/status`);if(!response.ok)throw new Error();status.value=await response.json();[statistics.value,weakPoints.value,latestReview.value,latestDigest.value,tasks.value,quizzes.value,memory.value]=await Promise.all([api.statistics(),api.weakPoints(),api.latestWeeklyReview(),api.latestDigest(),api.tasks(),api.quizzes(),api.memoryStatistics()])}catch{unavailable.value=true}finally{loading.value=false}})
+onMounted(async()=>{try{const base=import.meta.env.VITE_API_BASE_URL||'';const response=await fetch(`${base}/api/system/status`);if(!response.ok)throw new Error();status.value=await response.json();[statistics.value,weakPoints.value,latestReview.value,latestDigest.value,tasks.value,quizzes.value,memory.value]=await Promise.all([api.statistics(),api.weakPoints(),api.latestWeeklyReview(),api.latestDigest(),api.tasks(),api.quizzes(),api.memoryStatistics()])}catch{unavailable.value=true}finally{loading.value=false}})
 </script>
 
 <template>
